@@ -1,118 +1,94 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>FitBot - Sua Personal Virtual</title>
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FITBOT — Personal Trainer Interativo</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
-
 <body>
+  <div class="app-shell">
+    <!-- PALCO DO AVATAR -->
+    <main class="stage-panel" aria-label="Palco do personal trainer animado">
+      <header class="top-bar">
+        <div class="brand">
+          <span class="brand-dot" aria-hidden="true"></span>
+          <h1>FITBOT</h1>
+        </div>
 
-    <header>
-        <h1>FIT<span>BOT</span></h1>
-        <p>SUA PERSONAL TRAINER VIRTUAL</p>
-    </header>
+        <div class="persona-switch" role="radiogroup" aria-label="Escolher personal trainer">
+          <button type="button" class="persona-btn active" data-persona="ramirez" role="radio" aria-checked="true">
+            Ramirez
+          </button>
+          <button type="button" class="persona-btn" data-persona="jonesy" role="radio" aria-checked="false">
+            Jonesy
+          </button>
+        </div>
 
-    <main class="container">
+        <div class="a11y-controls">
+          <button type="button" id="btnMute" class="icon-btn" aria-pressed="false" title="Ativar/Desativar áudio">
+            🔊 Som
+          </button>
+          <button type="button" id="btnStopAudio" class="icon-btn" title="Interromper fala">
+            ⏹ Parar
+          </button>
+        </div>
+      </header>
 
-        <!-- ÁREA DOS AVATARES -->
-        <section class="avatar-area">
+      <div class="canvas-wrapper">
+        <canvas id="avatarCanvas" aria-label="Avatar animado do personal trainer"></canvas>
 
-            <div class="avatar-display" id="caixa-avatar">
-                <canvas
-                    id="avatar-canvas"
-                    width="440"
-                    height="560"
-                    aria-label="Avatar animado da persona FitBot">
-                </canvas>
-            </div>
+        <!-- Indicador visual de estado (acessibilidade visual) -->
+        <div id="statePill" class="state-pill idle" role="status" aria-live="polite">
+          <span class="pulse-dot"></span>
+          <span id="stateText">Pronta para treinar</span>
+        </div>
 
-            <h2 id="nome-personagem">Jonesy</h2>
-
-            <p class="status" id="status-avatar">● Online para conversar</p>
-
-            <div class="selecao-personagem">
-
-                <button
-                    type="button"
-                    onclick="selecionarAvatar('masculino')"
-                    class="botao-avatar ativo"
-                    id="btn-masculino">
-                    Masculino
-                </button>
-
-                <button
-                    type="button"
-                    onclick="selecionarAvatar('feminino')"
-                    class="botao-avatar"
-                    id="btn-feminino">
-                    Feminino
-                </button>
-
-            </div>
-
-        </section>
-
-        <!-- ÁREA DO CHAT -->
-        <section class="chat-area">
-
-            <div class="chat-header">
-                <h2>Converse com a FitBot</h2>
-                <p>Digite ou use o microfone. As respostas aparecem em texto e voz.</p>
-            </div>
-
-            <div class="messages" aria-live="polite">
-
-                <div class="bot-message">
-                    Olá! Eu sou o Jonesy. Como posso ajudar no seu treino hoje?
-                </div>
-
-                {% if resposta %}
-
-                    <div class="user-message">
-                        {{ mensagem }}
-                    </div>
-
-                    <div class="bot-message" id="ultima-resposta">
-                        {{ resposta }}
-                    </div>
-
-                {% endif %}
-
-            </div>
-
-            <form method="POST" class="message-form">
-
-                <input
-                    type="text"
-                    name="mensagem"
-                    placeholder="Digite sua mensagem ou fale no microfone..."
-                    autocomplete="off"
-                >
-
-                <button
-                    type="button"
-                    id="btn-microfone"
-                    class="mic-button"
-                    title="Falar pelo microfone"
-                    aria-label="Falar pelo microfone">
-                    🎤
-                </button>
-
-                <button type="submit">Enviar</button>
-
-            </form>
-
-        </section>
-
+        <!-- Legenda ao vivo sobreposta opcional -->
+        <div id="liveCaption" class="live-caption" aria-live="polite"></div>
+      </div>
     </main>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <!-- CHAT LATERAL ACESSÍVEL -->
+    <aside class="chat-panel" aria-label="Histórico de conversa e entrada de mensagens">
+      <div class="chat-header">
+        <div>
+          <h2 id="personaTitle">Ramirez</h2>
+          <p id="personaSubtitle">Técnica, postura e evolução constante</p>
+        </div>
+        <button type="button" id="btnClear" class="clear-btn" title="Limpar conversa">Limpar</button>
+      </div>
 
+      <div id="chatLog" class="chat-log" role="log" aria-live="polite" aria-relevant="additions"></div>
+
+      <form id="chatForm" class="chat-input-bar" autocomplete="off">
+        <button
+          type="button"
+          id="btnMic"
+          class="mic-btn"
+          aria-pressed="false"
+          aria-label="Falar no microfone (Alt+M)"
+          title="Falar no microfone (Alt+M)"
+        >
+          🎙️
+        </button>
+
+        <label for="textInput" class="sr-only">Digite sua mensagem para o personal trainer</label>
+        <input
+          id="textInput"
+          type="text"
+          placeholder="Digite ou clique no microfone para falar..."
+          required
+        />
+
+        <button type="submit" id="btnSend" class="send-btn" aria-label="Enviar mensagem">
+          Enviar
+        </button>
+      </form>
+    </aside>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/avatarRig.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
-
 </html>
